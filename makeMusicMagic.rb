@@ -19,6 +19,8 @@ class MakeMusicMagic
 
   def runMusic
     while user_input = $stdin.gets.chomp
+      # By splitting the user_input it is possible to easily detemine what the user wants
+      # and to grab the relevant values
       user_input_words = user_input.split
       case user_input_words[0]
       when "exit"
@@ -57,7 +59,7 @@ class MakeMusicMagic
     info artist artist_id: display info about the specific artist
     add artist artistname: add the new artist to the library
     add track trackname by artist_id: add a new track
-    play track trackname: play the current track
+    play track trackname by artist_id: play the track trackname by artist_id
     count tracks by artist_id: displays a count of a specific artist
     list tracks by artist_id: list tracks by a specific artist"
     puts help_lines
@@ -77,8 +79,11 @@ class MakeMusicMagic
       puts "The current playlist is:"
       puts @current_playlist
     when "artist"
+      # Determine the artist id
       artist_id = user_input_words[2]
+      # If that id exists in the data
       if @data.has_key?(:"#{artist_id}")
+        # Print the artist name and relevant information
         puts "Artist name: " + @data[:"#{artist_id}"].name
         puts "Artist id: " + @data[:"#{artist_id}"].id
         puts "Discography:"
@@ -87,13 +92,18 @@ class MakeMusicMagic
         puts artist_id + " isn't in library"
       end
     when "track"
+      # Determine the track name
       track_name = user_input_words[2..user_input_words.size].join(" ")
+      # For each key value pair in the database
       @data.each do |key, value|
+        # for each track in the value (which is an Artist object)
         value.tracks.each do |track|
+          # If the track name matches one of the tracks print the relevant information
           if track.name == track_name
             puts "Song Title: " + track.name
             puts "Artist: " + @data[:"#{key}"].name
             puts "Play count: #{track.count}"
+            # manipulating this break on and off determines whether or not to search for only one instance
             break
           end
         end
@@ -106,19 +116,28 @@ class MakeMusicMagic
   def additive(user_input_words)
     case user_input_words[1]
     when "artist"
+      # Determine the artist name
       artist_name = user_input_words[2..user_input_words.size]
       artist_name = artist_name.join(" ")
+      # Create a new Artist object
       current_artist =  Artist.new(artist_name,[])
+      # Add the Artist to the database using the artist id
       @data[:"#{current_artist.id}"] = current_artist
+      # Save the updated database
       @music_library.transaction do
         @music_library[:data] = @data
       end
     when "track"
+      # Determine the trackname and the artist it is by
       track_name = user_input_words[2..user_input_words.size-3].join(" ")
       artist_id = user_input_words[user_input_words.size - 1]
+      # Create a new Track object
       current_track = Track.new(track_name)
+      # Check if the artist id exists in the library
       if @data.key?(:"#{artist_id}")
+        # Add the current track to the Artist's track list
         @data[:"#{artist_id}"].addTrack(current_track)
+        # Save the database
         @music_library.transaction do
           @music_library[:data] = @data
         end
