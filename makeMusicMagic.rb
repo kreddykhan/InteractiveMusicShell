@@ -18,10 +18,9 @@ class MakeMusicMagic
   end
 
   def runMusic
-    while user_input = $stdin.gets.chomp
+    while user_input_words = $stdin.gets.chomp.split
       # By splitting the user_input it is possible to easily detemine what the user wants
       # and to grab the relevant values
-      user_input_words = user_input.split
       case user_input_words[0]
       when "exit"
         # When you exit be sure to update the library data before quiting
@@ -40,7 +39,7 @@ class MakeMusicMagic
         playMusic(user_input_words)
       when "count"
         artist_id = user_input_words[user_input_words.size - 1]
-        puts artist_track = @data[:"#{artist_id}"].tracks.size
+        puts @data[:"#{artist_id}"].tracks.size
       when "list"
         artist_id = user_input_words[user_input_words.size - 1]
         @data[:"#{artist_id}"].printTracksAndCount
@@ -56,12 +55,12 @@ class MakeMusicMagic
     exit: save your music library and eit the program
     info: display a summary of your library
     info track trackname: display info about the track trackname
-    info artist artist_id: display info about the specific artist
-    add artist artistname: add the new artist to the library
-    add track trackname by artist_id: add a new track
-    play track trackname by artist_id: play the track trackname by artist_id
-    count tracks by artist_id: displays a count of a specific artist
-    list tracks by artist_id: list tracks by a specific artist"
+    info artist *artist_id*: display info about the specific artist
+    add artist *artistname*: add the new artist to the library
+    add track *trackname* by *artist_id*: add a new track
+    play track *trackname* by *artist_id*: play the track trackname by artist_id
+    count tracks by *artist_id*: displays a count of a specific artist
+    list tracks by *artist_id*: list tracks by a specific artist"
     puts help_lines
   end
 
